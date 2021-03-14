@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search> 
+  
+  
+    
+    <entry>
+      <title>Spring application - JPEG image not shown in IE</title>
+      <link href="2020/07/13/JPEG-image-not-shown-in-IE/"/>
+      <url>2020/07/13/JPEG-image-not-shown-in-IE/</url>
+      
+        <content type="html"><![CDATA[<p>JPEG image not shown in IE. The responses were arriving with a header that was causing the problem “Unable to decode image”:</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">X-Content-Type-Options: nosniff</span><br></pre></td></tr></table></figure><h2 id="Diagnostics"><a href="#Diagnostics" class="headerlink" title="Diagnostics:"></a>Diagnostics:</h2><p>The header is introduced by Spring Security. Besides this is a security mechanism for Internet Explorer to avoid XSS attacks, the fastest solution to disable this header on response were putting the following line on the application context file of Spring Security, headers section:</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;http use-expressions&#x3D;&quot;true&quot; create-session&#x3D;&quot;never&quot; auto-config&#x3D;&quot;true&quot;&gt;</span><br><span class="line">    &lt;headers&gt;</span><br><span class="line">        &lt;!-- this section disable put the header &#39;X-Content-Type-Options&#39; --&gt;</span><br><span class="line">        &lt;content-type-options disabled&#x3D;&quot;true&quot;&#x2F;&gt;</span><br><span class="line">    &lt;&#x2F;headers&gt;</span><br></pre></td></tr></table></figure><p>This problem were only happening on Internet Explorer 11. Not in Chrome or Firefox.</p><h2 id="Solution"><a href="#Solution" class="headerlink" title="Solution:"></a>Solution:</h2><p>Add the following setting in Spring Security config file</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;security:http auto-config&#x3D;&quot;true&quot; use-expressions&#x3D;&quot;true&quot; authentication-manager-ref&#x3D;&quot;external&quot; pattern&#x3D;&quot;&#x2F;public&#x2F;**&quot; &gt; </span><br><span class="line">  &lt;security:headers&gt;</span><br><span class="line">    &lt;!-- this section disable header &#39;X-Content-Type-Options&#39; --&gt;</span><br><span class="line">    &lt;security:content-type-options disabled&#x3D;&quot;true&quot; &#x2F;&gt;</span><br><span class="line">  &lt;&#x2F;security:headers&gt;</span><br></pre></td></tr></table></figure><p>For details, chek <a href="https://stackoverflow.com/questions/27934411/images-failing-to-load-in-ie-with-dom-7009-error-unable-to-decode-in-console">this</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> tech issue </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Weblogic 12c memory leak of JMS with transaction manager</title>
+      <link href="2020/06/12/My-first-blog/"/>
+      <url>2020/06/12/My-first-blog/</url>
+      
+        <content type="html"><![CDATA[<p>java.lang.OutOfMemoryError happening 5-7 days after restart weblogic ManagedServer. Not visible immediately after the server restarts. Still happen after increasing java MaxHeapSize parameter.</p><h2 id="Diagnostics"><a href="#Diagnostics" class="headerlink" title="Diagnostics:"></a>Diagnostics:</h2><p>Use the Java Mission Control (JMC) and jvisualvm tools.<br>To enable JMC for an environment, use the following flags in the Server Start arguments:</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">-Dcom.sun.management.jmxremote.port=7091 </span><br><span class="line">-Dcom.sun.management.jmxremote.authenticate=<span class="literal">false</span> </span><br><span class="line">-Dcom.sun.management.jmxremote.ssl=<span class="literal">false</span> </span><br><span class="line">-Dcom.sun.management.jmxremote=<span class="literal">true</span> </span><br><span class="line">-Dcom.sun.management.jmxremote.rmi.port=7091</span><br></pre></td></tr></table></figure><p>Root cause: memory leak of long[] objects, about 1 instance per second, belonging to ServerTimerImpl objects (weblogic objects)</p><h2 id="Solution"><a href="#Solution" class="headerlink" title="Solution:"></a>Solution:</h2><p>Remove the Weblogic-specific transaction manager in <strong>applicationContext-queue.xml</strong>.</p><h2 id="Senario"><a href="#Senario" class="headerlink" title="Senario"></a>Senario</h2><p>We had exactly the same issue on Weblogic 12c and activemq-ra. XATransactionId object instances were created continuously causing server overload.</p><p>After more than 2 weeks of debugging, we found that the problem was caused by <strong>WebLogic Transaction Manager</strong> trying to recover some pending activemq transactions by calling the method recover() which returns the ids of transaction that seems to be not completed and have to be recovered. The call to this method by Weblogic returned always a not null number n (always the same) and that causes the creation of n instance of XATransactionId object.</p><p>After some investigations, we found that Weblogic stores by default its Transaction logs <strong>TLOG</strong> in filesystem and this can be changed to be persisted in DB. We thought that there was a problem in TLOGs being in file system and we tried to change it to DB and it worked! Now our server runs for more that 2 weeks without any restart and memory is stable because no XATransactionId are created a part from the necessary amount of it.</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> tech issue </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> weblogic </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>SVN - special note of binary files</title>
+      <link href="2020/05/13/SVN-Special-Note-of-Binary-files/"/>
+      <url>2020/05/13/SVN-Special-Note-of-Binary-files/</url>
+      
+        <content type="html"><![CDATA[<p>Binary files in the project can’t be merged, and hence the files must be locked by the users before editing them.</p><p>Binary files needs to have a svn attribute set to enforce “lock-before commit”. </p><ol><li><p>svn add the file<br><img src="/images/pasted-4.png" alt="upload successful"><br><img src="/images/pasted-5.png" alt="upload successful"></p></li><li><p>Add attribute to new binary file<br><img src="/images/pasted-6.png" alt="upload successful"><br><img src="/images/pasted-7.png" alt="upload successful"></p></li><li><p>Commit attribute changes<br><img src="/images/pasted-8.png" alt="upload successful"></p></li><li><p>Binary files with attribute set is by default read only and would require a explicit lock<br><img src="/images/pasted-9.png" alt="upload successful"><br><img src="/images/pasted-10.png" alt="upload successful"></p></li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> source storage </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Commandlink/CommandButton with ajax works only on second click</title>
+      <link href="2020/05/10/Commandlink-CommandButton-with-ajax-works-only-on-second-click/"/>
+      <url>2020/05/10/Commandlink-CommandButton-with-ajax-works-only-on-second-click/</url>
+      
+        <content type="html"><![CDATA[<p>The problem starts to appear when I include primefaces or ajax code inside the content form. </p><p>When you fire an ajax request using &lt;f:ajax&gt; and performs an update which also covers all other forms, then all those other forms will lose their view state. This causes that the 1st submit will always “do nothing”, but the next submits will work, which matches exactly your problem symptoms.</p><h2 id="Solution"><a href="#Solution" class="headerlink" title="Solution:"></a>Solution:</h2><p>As the PrimeFaces User’s Guide states in section 3.18, the defaults for process and update are both @form.</p><p>You need to add attribute process=”@this” into commandlink/commandbutton tag.</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> tech issue </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> primefaces </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Facelet repeat tag not render string list properly</title>
+      <link href="2020/05/08/ui-repeat-not-render-string-list-properly/"/>
+      <url>2020/05/08/ui-repeat-not-render-string-list-properly/</url>
+      
+        <content type="html"><![CDATA[<p>The JSF code:</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;h:form&gt;</span><br><span class="line">    &lt;ui:repeat value&#x3D;&quot;#&#123;mrBean.stringList&#125;&quot; var&#x3D;&quot;stringItem&quot;&gt;</span><br><span class="line">        &lt;h:inputText value&#x3D;&quot;#&#123;stringItem&#125;&quot; &#x2F;&gt;</span><br><span class="line">    &lt;&#x2F;ui:repeat&gt;</span><br><span class="line">    &lt;h:commandButton value&#x3D;&quot;Add&quot; action&#x3D;&quot;#&#123;mrBean.addContextItem&#125;&quot; update&#x3D;&quot;@form&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;h:form&gt;</span><br></pre></td></tr></table></figure><p>The problem is, when clicking the “Add” button, the values that were entered in the &lt;h:inputText/&gt; that represent the Strings in the stringList aren’t executed.</p><p>Actually, the mrBean.stringList setter (setStringList(List<String> stringList)) is never called.</p><h2 id="Solution："><a href="#Solution：" class="headerlink" title="Solution："></a>Solution：</h2><p>The String class is immutable and doesn’t have a setter for the value. The getter is basically the Object#toString() method.</p><p>You need to get/set the value directly on the List instead. You can do that by the list index which is available by &lt;ui:repeat varStatus&gt;.</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;ui:repeat value&#x3D;&quot;#&#123;mrBean.stringList&#125;&quot; varStatus&#x3D;&quot;loop&quot;&gt;</span><br><span class="line">    &lt;h:inputText value&#x3D;&quot;#&#123;mrBean.stringList[loop.index]&#125;&quot; &#x2F;&gt; </span><br><span class="line">&lt;&#x2F;ui:repeat&gt;</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> tech issue </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> jsf </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Hibernate logs are not available since v4</title>
+      <link href="2020/04/13/Hibernate-logs-are-not-available-since-v4/"/>
+      <url>2020/04/13/Hibernate-logs-are-not-available-since-v4/</url>
+      
+        <content type="html"><![CDATA[<p>Since v4, Hibernate uses jboss-logging as logging framework. This framework delegates to one of the following: log4j2, log4j, slf4j, Java Utils Logging.</p><h2 id="Diagnostics"><a href="#Diagnostics" class="headerlink" title="Diagnostics:"></a>Diagnostics:</h2><p>My application uses SLF4J/Log4j as logging library but jboss-logging can’t seem to find this library. The reason is probably that jboss-logging is loaded from the Weblogic server modules classloader whereas log4j is loaded from the application classloader.</p><h2 id="Solution"><a href="#Solution" class="headerlink" title="Solution:"></a>Solution:</h2><p>Tell Weblogic to use the application-provider jboss-logging instead of the Weblogic-provided one. This is done by having the following in weblogic.xml:</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;container-descriptor&gt;</span><br><span class="line">  &lt;prefer-application-packages&gt; </span><br><span class="line">    &lt;!-- Weblogic provides its own jboss-logging library which Hibernate uses. Since it&#39;s in the server class-loader (com.oracle.classloader.weblogic.LaunchClassLoader), it doesn&#39;t see the application-provided SLF4J and Log4j libraries. So ask Weblogic to use our jboss-logging. --&gt;</span><br><span class="line">    &lt;package-name&gt;org.jboss.logging&lt;&#x2F;package-name&gt;</span><br><span class="line">  &lt;&#x2F;prefer-application-packages&gt;</span><br><span class="line">&lt;&#x2F;container-descriptor&gt;</span><br></pre></td></tr></table></figure><p><strong>Note:</strong> Don’t forget to set the Log4j appender threshold to TRACE.</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> tech issue </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> web config </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>JSF rerender elements by class name via update el</title>
+      <link href="2020/04/03/JSF-rerender-elements-by-class-name-via-update-el/"/>
+      <url>2020/04/03/JSF-rerender-elements-by-class-name-via-update-el/</url>
+      
+        <content type="html"><![CDATA[<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;h:panelGroup styleClass&#x3D;&quot;addressDialogPg&quot;&gt;</span><br><span class="line">.....</span><br><span class="line">&lt;&#x2F;h:panelGroup&gt;</span><br><span class="line"></span><br><span class="line">&lt;p:commandButton id&#x3D;&quot;copyAddress&quot; value&#x3D;&quot;Copy address&quot; action&#x3D;&quot;#&#123;addressDialog.copyAddress&#125;&quot; immediate&#x3D;&quot;true&quot; process&#x3D;&quot;@this&quot; update&#x3D;&quot;@(.addressDialogPg)&quot;&#x2F;&gt;</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> tech note </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> jsf </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Prevent form resubmitting while refreshing the page</title>
+      <link href="2020/04/02/Prevent-form-resubmitting-while-refreshing-the-page/"/>
+      <url>2020/04/02/Prevent-form-resubmitting-while-refreshing-the-page/</url>
+      
+        <content type="html"><![CDATA[<p>Add the following script into the page to prevent from resubmitting.  </p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;</span><br><span class="line">    if ( window.history.replaceState ) &#123;</span><br><span class="line">    window.history.replaceState( null, null, window.location.href );</span><br><span class="line">    &#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> tech note </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Primefaces JS/CSS not loading</title>
+      <link href="2020/03/29/Primefaces-JS-CSS-not-loading/"/>
+      <url>2020/03/29/Primefaces-JS-CSS-not-loading/</url>
+      
+        <content type="html"><![CDATA[<p>PrimeFaces will auto-include the necessary JS/CSS resources in <code>&lt;h:head&gt;</code>. However, if you don’t have that tag and use a “plain HTML” <code>&lt;head&gt;</code>, the included JS/CSS will not be loaded.</p><p>This mistake should also have been logged in the server log as below:<br><em>One or more resources has the target of ‘head’ but not ‘head’ component has been defined within the view</em></p><h2 id="Solution"><a href="#Solution" class="headerlink" title="Solution:"></a>Solution:</h2><p>Put JS/CSS resources in <code>&lt;h:head&gt;</code> as follows.</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;html&gt;</span><br><span class="line">    &lt;h:head&gt;</span><br><span class="line">        ...</span><br><span class="line">    &lt;&#x2F;h:head&gt;</span><br><span class="line">    &lt;h:body&gt;</span><br><span class="line">        ...</span><br><span class="line">    &lt;&#x2F;h:body&gt;</span><br><span class="line">&lt;&#x2F;html&gt;</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> tech issue </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> primefaces </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Redirect if javascript is disabled or not support in browser</title>
+      <link href="2020/03/28/redirect-if-javascript-not-support-in-browser/"/>
+      <url>2020/03/28/redirect-if-javascript-not-support-in-browser/</url>
+      
+        <content type="html"><![CDATA[<p>The <code>&lt;noscript&gt;</code> tag defines an alternate content for users that have disabled scripts in their browser or have a browser that doesn’t support script.</p><p>The <code>&lt;noscript&gt;</code> element can be used in both <code>&lt;head&gt;</code> and <code>&lt;body&gt;</code>.</p><p>When used inside the <code>&lt;head&gt;</code> element: <code>&lt;noscript&gt;</code> must contain only <code>&lt;link&gt;</code>, <code>&lt;style&gt;</code>, and <code>&lt;meta&gt;</code> elements.</p><p>The content inside the <code>&lt;noscript&gt;</code> element will be displayed if scripts are not supported, or are disabled in the user’s browser.</p><p>Example:</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;noscript&gt;</span><br><span class="line">    &lt;meta http-equiv&#x3D;&quot;REFRESH&quot; content&#x3D;&quot;0;url&#x3D;&#x2F;fuelwatch&#x2F;pages&#x2F;javascriptBlockedRedirect.jspx&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;noscript&gt;</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> tech note </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Oracle package for exporting data into excel</title>
+      <link href="2020/03/17/Oracle-package-for-exporting-data-into-excel/"/>
+      <url>2020/03/17/Oracle-package-for-exporting-data-into-excel/</url>
+      
+        <content type="html"><![CDATA[<p>Refer to <a href="https://github.com/hjq0930/oracle_package_excel">https://github.com/hjq0930/oracle_package_excel</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> tech note </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Prevent Browsers from cacheing JS/CSS</title>
+      <link href="2020/03/15/Prevent-Browsers-from-cacheing-JS-CSS/"/>
+      <url>2020/03/15/Prevent-Browsers-from-cacheing-JS-CSS/</url>
+      
+        <content type="html"><![CDATA[<p>Browsers always cache js/css files, and then the updates won’t take effect immediately after new production release.</p><p>Add session id into js/css loading to prevent the caching.</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;script src&#x3D;&quot;&#x2F;script.js?session&#x3D;&lt;%&#x3D;&#x2F;&#x2F;code to get the session ID %&gt;&quot; &#x2F;&gt;</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> tech note </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Primefaces: displaying tabs with validation errors</title>
+      <link href="2020/03/14/Primefaces-Displaying-tabs-with-validation-errors/"/>
+      <url>2020/03/14/Primefaces-Displaying-tabs-with-validation-errors/</url>
+      
+        <content type="html"><![CDATA[<p>When a validation error occurs on submission on a tab other than the default tab, it was not clear to the user where the validation failure occurred.</p><p>The following code snippets will result in the first tab with errors being selected when a validation failure occurs. It’s meant to work with PrimeFaces components with the ui-error-state styling, but could be adapted for the standard JSF components too.</p><ol><li>JavaScript Function  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">function showFirstInvalidTab(tabPanelWidget) &#123;   </span><br><span class="line">    var index &#x3D; $(&#39;div.ui-tabs-panel:has(.ui-state-error, .ui-message-error-detail)&#39;).attr(&#39;data-index&#39;);</span><br><span class="line">    if (index)&#123;</span><br><span class="line">        &#x2F;&#x2F; Temp hack - This worked in PF 6.0, but tab content not displayed in PF 6.2 without delay.  </span><br><span class="line">        setTimeout(function()&#123;</span><br><span class="line">            tabPanelWidget.select(index);    </span><br><span class="line">        &#125;, 100);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li><li>Call the Function<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;</span><br><span class="line">   showFirstInvalidTab();</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure></li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> tech note </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> primefaces </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Hexo admin setup</title>
+      <link href="2020/03/13/Hexo-admin/"/>
+      <url>2020/03/13/Hexo-admin/</url>
+      
+        <content type="html"><![CDATA[<p>Instead of using command to publish hexo post, Hexo admin plugin provide a GUI interface.</p><p>For installation, refer to <a href="https://github.com/jaredly/hexo-admin">this</a>.</p><p>After installation, setup deploymentCommand in admin.</p><ol><li><p>create sh file in the hexo root directory</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi hexo-pubish.sh</span><br></pre></td></tr></table></figure></li><li><p>Write commands and save in sh file</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#!&#x2F;usr&#x2F;bin&#x2F;env sh</span><br><span class="line">hexo clean</span><br><span class="line">hexo g</span><br><span class="line">hexo d</span><br></pre></td></tr></table></figure></li><li><p>Modify the execution permission of the sh file</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chmod +x hexo-publish.sh</span><br></pre></td></tr></table></figure></li><li><p>Modify configuration file by adding deployCommand setting </p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># hexo-admin authentification</span><br><span class="line">admin:</span><br><span class="line">  username: ******</span><br><span class="line">  password_hash: ******</span><br><span class="line">  secret: ******</span><br><span class="line">  deployCommand: &#39;.&#x2F;hexo-publish.sh&#39;</span><br></pre></td></tr></table></figure></li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> tech note </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> hexo </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Hexo quick start</title>
+      <link href="2020/03/13/hello-world/"/>
+      <url>2020/03/13/hello-world/</url>
+      
+        <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo s</span><br></pre></td></tr></table></figure><h3 id="Remove-generated-files-and-cache"><a href="#Remove-generated-files-and-cache" class="headerlink" title="Remove generated files and cache"></a>Remove generated files and cache</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo clean</span><br></pre></td></tr></table></figure><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo g</span><br></pre></td></tr></table></figure><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo d</span><br></pre></td></tr></table></figure><h2 id="Hexo-Commands"><a href="#Hexo-Commands" class="headerlink" title="Hexo Commands"></a>Hexo Commands</h2><p><img src="/images/pasted-3.png" alt="upload successful"></p>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> hexo </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+  
+  
+</search>
