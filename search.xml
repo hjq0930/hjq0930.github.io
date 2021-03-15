@@ -4,11 +4,11 @@
   
     
     <entry>
-      <title>Setup maven and maven wrapper in mac</title>
-      <link href="2021/07/16/Setup-maven-and-maven-wrapper-in-mac/"/>
-      <url>2021/07/16/Setup-maven-and-maven-wrapper-in-mac/</url>
+      <title>Start spring boot project with IntelliJ</title>
+      <link href="2021/02/19/Start-SpringBoot-project-with-IntelliJ/"/>
+      <url>2021/02/19/Start-SpringBoot-project-with-IntelliJ/</url>
       
-        <content type="html"><![CDATA[<p>In Mac, it is suggested to install the latest maven using brew.</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew install maven</span><br></pre></td></tr></table></figure><p>However, if Mac OS is too old to support the installation, you have to manually install maven by downloading from <a href="https://maven.apache.org/download.cgi">maven</a>, for example apache-maven-3.6.3-bin.tar.gz</p><ul><li><p>Step 1<br>Go to download folder, and extract the file apache-maven-3.6.3</p></li><li><p>Step 2<br>Setup maven classpath to your env variable by adding the following three lines into .bash_profile file.</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">export JAVA_HOME&#x3D;&#x2F;Library&#x2F;Java&#x2F;JavaVirtualMachines&#x2F;jdk-15.0.2.jdk&#x2F;Contents&#x2F;Home</span><br><span class="line">export M2_HOME&#x3D;~&#x2F;apache-maven-3.6.3</span><br><span class="line">export PATH&#x3D;$PATH:$M2_HOME&#x2F;bin</span><br></pre></td></tr></table></figure><p>Note: make sure the JDK installation.</p></li><li><p>Step 3<br>Reload .bash_profile from the command line</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">source ~&#x2F;.bash_profile</span><br></pre></td></tr></table></figure></li><li><p>Step 3<br>Verify the maven installation via command mvn -version</p></li><li><p>Step 4<br>Install Maven Wrapper plugin to make auto installation in a simple Spring Boot project.</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mvn -N io.takari:maven:wrapper</span><br></pre></td></tr></table></figure><p>Build Spring Boot project by mvnw command</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.&#x2F;mvnw clean install</span><br></pre></td></tr></table></figure><p>Run Spring-Boot project by mvnw command</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.&#x2F;mvnw spring-boot:run</span><br></pre></td></tr></table></figure></li></ul>]]></content>
+        <content type="html"><![CDATA[<p><strong>Spring Boot</strong> offers a fast way to build applications. However, I would suggest to build web application with Spring framework first. It will help you understand more about Spring framework, because you need to setup spring configuration yourself.</p><p><a href="https://www.jetbrains.com/help/idea/your-first-spring-application.html">This tutorial</a> is good start for spring boot with IntelliJ.</p>]]></content>
       
       
       <categories>
@@ -18,14 +18,76 @@
       </categories>
       
       
+        <tags>
+            
+            <tag> intellij </tag>
+            
+            <tag> spring boot </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Spring Spring MVC and Spring Boot</title>
+      <link href="2021/02/18/Spring-vs-Spring-Boot/"/>
+      <url>2021/02/18/Spring-vs-Spring-Boot/</url>
+      
+        <content type="html"><![CDATA[<p><strong>Spring</strong> is the most popular application development framework of Java. The main features of the Spring Framework are Dependency Injection (DI) / Inversion of Control (IoC), and Aspect Oriented Programming (AOP).</p><p><strong>Spring MVC</strong> is a model view controller-based web framework under the Spring framework.</p><p><strong>Spring Boot</strong> is a module of Spring for packaging the Spring-based application with sensible defaults. It allows us to build a stand-alone application with minimal or zero configurations.</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> tech note </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> spring boot </tag>
+            
+            <tag> spring </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Setup maven and maven wrapper in mac</title>
+      <link href="2021/02/16/Setup-maven-and-maven-wrapper-in-mac/"/>
+      <url>2021/02/16/Setup-maven-and-maven-wrapper-in-mac/</url>
+      
+        <content type="html"><![CDATA[<p>In Mac, it is suggested to install the latest maven using brew. However, if Mac OS version is too old to support the installation, you have to manually install maven by downloading from <a href="https://maven.apache.org/download.cgi">maven</a>, for example apache-maven-3.6.3-bin.tar.gz</p><ul><li><p>Step 1<br>Go to download folder, and extract the file apache-maven-3.6.3</p></li><li><p>Step 2<br>Setup maven classpath to your env variable by adding the following three lines into .bash_profile file.</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">export JAVA_HOME&#x3D;&#x2F;Library&#x2F;Java&#x2F;JavaVirtualMachines&#x2F;jdk-15.0.2.jdk&#x2F;Contents&#x2F;Home</span><br><span class="line">export M2_HOME&#x3D;~&#x2F;apache-maven-3.6.3</span><br><span class="line">export PATH&#x3D;$PATH:$M2_HOME&#x2F;bin</span><br></pre></td></tr></table></figure><p>Note: make sure the JDK installation.</p></li><li><p>Step 3<br>Reload .bash_profile from the command line</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">source ~&#x2F;.bash_profile</span><br></pre></td></tr></table></figure></li><li><p>Step 3<br>Verify the maven installation via command mvn -version</p></li><li><p>Step 4<br>Install Maven Wrapper plugin to make auto installation in a simple Spring Boot project.</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mvn -N io.takari:maven:wrapper</span><br></pre></td></tr></table></figure><p>Build Spring Boot project by mvnw command</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.&#x2F;mvnw clean install</span><br></pre></td></tr></table></figure><p>Run Spring-Boot project by mvnw command</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.&#x2F;mvnw spring-boot:run</span><br></pre></td></tr></table></figure></li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> tech note </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> maven </tag>
+            
+            <tag> spring boot </tag>
+            
+        </tags>
+      
     </entry>
     
     
     
     <entry>
       <title>IntelliJ auto import packages</title>
-      <link href="2020/07/15/IntelliJ-auto-import-library/"/>
-      <url>2020/07/15/IntelliJ-auto-import-library/</url>
+      <link href="2021/02/15/IntelliJ-auto-import-library/"/>
+      <url>2021/02/15/IntelliJ-auto-import-library/</url>
       
         <content type="html"><![CDATA[<p>For IntelliJ IDEA, if press CTRL + ALT + O (Optimize Imports), it just removes unused imports; if click on the class name and press ALT + ENTER keys, it imports the associated packages.</p><p>To auto import and optimize imports, enable the following features.<br>File –&gt;&gt; Settings –&gt;&gt; Editor –&gt;&gt; General –&gt;&gt; Auto Import –&gt;&gt; Checked these options :</p><ol><li>Add unambiguous imports on the fly</li><li>Optimize imports on the fly</li></ol><p><img src="/images/pasted-11.png" alt="upload successful"></p>]]></content>
       
@@ -37,14 +99,20 @@
       </categories>
       
       
+        <tags>
+            
+            <tag> intellij </tag>
+            
+        </tags>
+      
     </entry>
     
     
     
     <entry>
       <title>Spring application - JPEG image not shown in IE</title>
-      <link href="2020/07/13/JPEG-image-not-shown-in-IE/"/>
-      <url>2020/07/13/JPEG-image-not-shown-in-IE/</url>
+      <link href="2021/02/13/JPEG-image-not-shown-in-IE/"/>
+      <url>2021/02/13/JPEG-image-not-shown-in-IE/</url>
       
         <content type="html"><![CDATA[<p>JPEG image not shown in IE. The responses were arriving with a header that was causing the problem “Unable to decode image”:</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">X-Content-Type-Options: nosniff</span><br></pre></td></tr></table></figure><h2 id="Diagnostics"><a href="#Diagnostics" class="headerlink" title="Diagnostics:"></a>Diagnostics:</h2><p>The header is introduced by Spring Security. Besides this is a security mechanism for Internet Explorer to avoid XSS attacks, the fastest solution to disable this header on response were putting the following line on the application context file of Spring Security, headers section:</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;http use-expressions&#x3D;&quot;true&quot; create-session&#x3D;&quot;never&quot; auto-config&#x3D;&quot;true&quot;&gt;</span><br><span class="line">    &lt;headers&gt;</span><br><span class="line">        &lt;!-- this section disable put the header &#39;X-Content-Type-Options&#39; --&gt;</span><br><span class="line">        &lt;content-type-options disabled&#x3D;&quot;true&quot;&#x2F;&gt;</span><br><span class="line">    &lt;&#x2F;headers&gt;</span><br></pre></td></tr></table></figure><p>This problem were only happening on Internet Explorer 11. Not in Chrome or Firefox.</p><h2 id="Solution"><a href="#Solution" class="headerlink" title="Solution:"></a>Solution:</h2><p>Add the following setting in Spring Security config file</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;security:http auto-config&#x3D;&quot;true&quot; use-expressions&#x3D;&quot;true&quot; authentication-manager-ref&#x3D;&quot;external&quot; pattern&#x3D;&quot;&#x2F;public&#x2F;**&quot; &gt; </span><br><span class="line">  &lt;security:headers&gt;</span><br><span class="line">    &lt;!-- this section disable header &#39;X-Content-Type-Options&#39; --&gt;</span><br><span class="line">    &lt;security:content-type-options disabled&#x3D;&quot;true&quot; &#x2F;&gt;</span><br><span class="line">  &lt;&#x2F;security:headers&gt;</span><br></pre></td></tr></table></figure><p>For details, chek <a href="https://stackoverflow.com/questions/27934411/images-failing-to-load-in-ie-with-dom-7009-error-unable-to-decode-in-console">this</a></p>]]></content>
       
@@ -105,7 +173,7 @@
     
     
     <entry>
-      <title>Commandlink/CommandButton with ajax works only on second click</title>
+      <title>Primefaces CommandButton with ajax works only on second click</title>
       <link href="2020/05/10/Commandlink-CommandButton-with-ajax-works-only-on-second-click/"/>
       <url>2020/05/10/Commandlink-CommandButton-with-ajax-works-only-on-second-click/</url>
       
